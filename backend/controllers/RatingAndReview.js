@@ -3,7 +3,7 @@ const Courses = require("../models/Courses");
 const User = require("../models/User");
 const mongoose  = require("mongoose");
 // creteRating
-exports.createRating = async(req,res)=>{
+exports.createRatingandReview = async(req,res)=>{
 
     try {
         // ftech the user id
