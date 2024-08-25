@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 
 // ***************************cors for the  connectivity between frontend and backend**************
+var cors = require("cors");
 app.use(
     cors({
         origin: "http://localhost:3000",

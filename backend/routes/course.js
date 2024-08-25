@@ -20,18 +20,18 @@ courseRouter.get("/getCourseDetails",  getCourseDetails);
 // creating all the router for rating and review
 courseRouter.post("/createRatingAndReview",isAuth,isStudent, createRatingandReview);
 
-courseRouter.get("getAllratingOfCourse", getAllratingOfCourse);
+courseRouter.get("/getAllratingOfCourse", getAllratingOfCourse);
 
-courseRouter.get("getAvgRating", getAvgRating);
+courseRouter.get("/getAvgRating", getAvgRating);
 
-courseRouter.get("getAllrating", getAllrating);
+courseRouter.get("/getAllrating", getAllrating);
 
 // creating all the routers for category
 courseRouter.post("/createCategory",isAuth,isAdmin, createCategory);
 
-courseRouter.get("getAllCategory", getAllCategory);
+courseRouter.get("/getAllCategory", getAllCategory);
 
-courseRouter.get("CategoryPageDetails", CategoryPageDetails);
+courseRouter.get("/CategoryPageDetails", CategoryPageDetails);
 
 // creating all the router for courses sections
 courseRouter.post("/createSection",isAuth,isInstructor, createSection);
@@ -43,7 +43,7 @@ courseRouter.delete("/deleteSection",isAuth,isInstructor, deleteSection);
 // creating all the router for sub section
 courseRouter.post("/createSubSection",isAuth,isInstructor, createSubSection);
 
-courseRouter.put("/updateSubSection", isAuth,isInstructor, updateSubSection);
+courseRouter.post("/updateSubSection", isAuth,isInstructor, updateSubSection);
 
 courseRouter.delete("/deleteSubSection",isAuth,isInstructor, deleteSubSection);
 
