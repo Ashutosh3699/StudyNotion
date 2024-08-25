@@ -22,8 +22,8 @@ const dbConnect = require("./config/database");
 dbConnect();
 
 // ********************************razorpay auth pending*************************
-const paymentConnect = require("./config/razorpayAuth");
-paymentConnect();
+// const paymentConnect = require("./config/razorpayAuth");
+// paymentConnect();
 
 // routers for user
 const userRouter = require("./routes/user");
