@@ -1,7 +1,13 @@
 const express = require("express");
 const app = express();
 
-// cors for the  connectivity between frontend and backend
+// ***************************cors for the  connectivity between frontend and backend**************
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+        credentials:true,
+    })
+  );
 
 // fetching data from  .env
 require("dotenv").config();
@@ -17,13 +23,16 @@ app.use(express.json());
 const connectCloudinary  =  require("./config/cloudinary");
 connectCloudinary();
 
+// ***********************************file uploader*******************
+const fileuploader = require("express-fileupload");
+app.use(fileuploader({
+    useTempFiles : true,
+    tempFileDir : '/tmp/'
+}));
+
 // database
 const dbConnect = require("./config/database");
 dbConnect();
-
-// ********************************razorpay auth pending*************************
-// const paymentConnect = require("./config/razorpayAuth");
-// paymentConnect();
 
 // routers for user
 const userRouter = require("./routes/user");
@@ -36,6 +45,10 @@ app.use("/api/v1/courseRouter", courseRouter);
 // routers for contact us
 const contactUs = require("./routes/contactUs");
 app.use("/api/v1/contactUs", contactUs);
+
+// routers for profile
+const profile = require("./routes/Profile");
+app.use("/api/v1/profile", profile);
 
 // routers for payment ********** router is pending**********
 const paymentRouter = require("./routes/payment");
