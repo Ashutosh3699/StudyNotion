@@ -54,8 +54,10 @@ exports.updateSubSection = async(req,res)=>{
         // fetch the data 
         const {subSection_id, title, videoDetail, timeDuration} = req.body;
         // fetch the file for video
-        const {video} = req.files.videoFile;
+        const video = req.files.videoFile;
         // check the validation
+
+        console.log(video);
         if(!video || !videoDetail || !title || !timeDuration || !subSection_id){
 
             return res.status(401).json({
@@ -64,13 +66,15 @@ exports.updateSubSection = async(req,res)=>{
             })
         }
          // get secured_url
-         const secured_url = await fileAndImageUploader(video, process.env.FOLDER_NAME);
+         console.log("first");
+         const video_url = await fileAndImageUploader(video, process.env.FOLDER_NAME);
+         console.log(video_url);
         // then update in db
         const response = await SubSection.findByIdAndUpdate(subSection_id, {
             title:title,
             timeDuration,
             videoDetail,
-            video:secured_url
+            video:video_url.secure_url
         });
         // return response
         return res.status(200).json({
@@ -91,7 +95,7 @@ exports.updateSubSection = async(req,res)=>{
 exports.deleteSubSection = async(req,res)=>{
     try {
         // fetch the subsection id using params
-        const {subSection_id} = req.params;
+        const {subSection_id} = req.body;
          // validate the data
          if(!subSection_id ){
             return res.status(400).json({
