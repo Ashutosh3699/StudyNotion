@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Category = require("../models/Categories");
 const Courses = require("../models/Courses");
-const { fileAndImageUploader } = require("../utils/imageUploader");
+const {fileAndImageUploader}   = require("../utils/imageUploader");
 
 require("dotenv").config();
 
@@ -10,8 +10,9 @@ exports.createCourse = async (req,res) =>{
         // fetch file and data
         const {courseName, courseDetail, price, whatWeWillLearn, tag,category,status , instructions} = req.body;
 
-        const  thumbnail = req.files.imagefile;
-
+        const  thumbnail = req.files.thumbnail;
+        console.log(req.body);
+        console.log(thumbnail);
         if(!courseName || !courseDetail || !price || !whatWeWillLearn || !tag || !thumbnail || !category){
 
             return res.status(400).json({
@@ -19,17 +20,15 @@ exports.createCourse = async (req,res) =>{
                 message: "Enter all the details",
             });
         }
-
         // *************** status wali chijj reh gai hai ********
-        if (!status || status === undefined) {
-			status = "Draft";
-		}
-
+        // status = "Draft";
+  
         // check the instructor dont require a db call as we will get the instructor id only
         const instructor_id = req.user.id;
 
+        console.log("instructor id is: ",instructor_id);
         // check the tag is aviable or not
-        const categoryIsAvailable = await Category.findById({category});
+        const categoryIsAvailable = await Category.findById(category);
 
         if(!categoryIsAvailable){
 
@@ -38,9 +37,11 @@ exports.createCourse = async (req,res) =>{
                 message: "Category is not available"
             });
         }
-
+        console.log("category is available", categoryIsAvailable);
         // image uploading
         const imageURL = await fileAndImageUploader(thumbnail, process.env.FOLDER_NAME);
+
+        console.log("image url is : ", imageURL.secure_url);
 
         if(!imageURL){
             return res.status(404).json({
@@ -55,7 +56,7 @@ exports.createCourse = async (req,res) =>{
             courseDetail,
             whatWeWillLearn,
             price,
-            thumbnail:imageURL,
+            thumbnail:imageURL.secure_url,
             category: categoryIsAvailable._id,
             instructor:instructor_id,
             tag:tag,
@@ -63,8 +64,9 @@ exports.createCourse = async (req,res) =>{
 			instructions: instructions,
         });
 
+        console.log("course created: ", response);
         // take the output or not check here
-        await Category.findByIdAndUpdate(tag, {
+        await Category.findByIdAndUpdate({_id:category}, {
             $push: {course: response._id}
         },
         {new:true});

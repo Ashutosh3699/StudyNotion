@@ -1,6 +1,7 @@
 const  User = require("../models/User");
 const mailsender = require("../utils/mailSender");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 // resetpasswordToken
 exports.resetPasswordToken = async(req,res) =>{
@@ -17,6 +18,8 @@ exports.resetPasswordToken = async(req,res) =>{
         }
 
         const response = await User.findOne({email});
+        console.log("email", email);
+
         if(!response){
             return res.status(401).json({
                 success:false,
@@ -24,9 +27,9 @@ exports.resetPasswordToken = async(req,res) =>{
             })
         } 
          // generate the token
-            const token = crypto.randomUUID();
+            const token = crypto.randomBytes(20).toString("hex");
         // insert the token in db  with resetTokenexpire
-            const data = await User.findByIdAndUpdate({email},{
+            const data = await User.findOneAndUpdate({email:email},{
                 token:token,
                 resetTokenexpires: Date.now() + 5*60*1000,
             },{new:true}
@@ -58,6 +61,8 @@ exports.resetPassword = async(req,res) =>{
         // fetch the token, password,confirmpassword
         const {token, password,confirmPassword} = req.body;
         // check the token in db and validate the token
+        console.log("token", token);
+
         if(!password || !confirmPassword){
             return res.status(401).json({
                 success:false,
@@ -74,13 +79,14 @@ exports.resetPassword = async(req,res) =>{
                 message:'Token is invalid',
             });
         }
-
+        console.log("response1", response);
         if(response.resetTokenexpires < Date.now()){
             return res.status(401).json({
                 success:false,
-                message: "Link have been expired please try again"
+                message: "Link have been expired please try again",
             })
         }
+        console.log("response2", response.resetTokenexpires);
         // check the password and confirm password
         if(password !== confirmPassword){
             return res.status(401).json({
@@ -89,7 +95,7 @@ exports.resetPassword = async(req,res) =>{
             })
         }
         // hash the password
-        const hashPassword = bcrypt.hash(password,10);
+        const hashPassword = await bcrypt.hash(password,10);
         //password update
         await User.findOneAndUpdate(
             {token:token},

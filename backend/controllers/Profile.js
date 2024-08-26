@@ -11,6 +11,7 @@ exports.updateProfile = async(req,res)=>{
         const user_id = req.user.id;
         // fetch the data from body
         const {phoneNumber,gender,DOB="",aboutUser=""}   = req.body;
+        console.log("user_id", phoneNumber);
         // check  the id and call out the db of user
         if(!phoneNumber || !gender || !DOB || !aboutUser){
 
@@ -21,19 +22,30 @@ exports.updateProfile = async(req,res)=>{
         }
         // db call for user
         const userDetails = await User.findById(user_id);
+        console.log("userDetails", userDetails);
         // call the profile of the user
-        const accountDetailsUser = await Profile.findById(userDetails.accountDetails);
+        const accountDetailsUser = await Profile.findByIdAndUpdate(userDetails.accountDetails,
+            {
+                phoneNumber,
+                gender,
+                DOB,
+                aboutUser
+            }
+        );
         // update the profile of the user
-        accountDetailsUser.phoneNumber= phoneNumber;
-        accountDetailsUser.gender = gender;
-        accountDetailsUser.DOB = DOB;
-        accountDetailsUser.aboutUser = aboutUser;
+        // accountDetailsUser.phoneNumber= phoneNumber;
+        // accountDetailsUser.gender = gender;
+        // accountDetailsUser.DOB = DOB;
+        // accountDetailsUser.aboutUser = aboutUser;
 
-        await accountDetailsUser.save();
+        console.log("updated account details", accountDetailsUser);
+        // await accountDetailsUser.save();
+        // console.log("updated");
         // return response
         return res.status(200).json({
             success:true,
-            message: "account details are updated successfully"
+            message: "account details are updated successfully",
+            accountDetailsUser,
         })
     } catch (error) {
         
@@ -51,8 +63,6 @@ exports.deleteProfile = async(req,res)=>{
         const user_id = req.user.id;
         // db call for user
         const userDetails = await User.findById(user_id);
-
-
         // ************************************************
         // ERROR MAY OCCUR HERE CHECK HERE CAREFULLY  **********************//
         // Schedule account deletion after 4-5 days
@@ -63,18 +73,10 @@ exports.deleteProfile = async(req,res)=>{
              // call the profile of the user and delete the profile
             await Profile.findByIdAndDelete({_id:userDetails.accountDetails});
             //  HW: delete the id of the user from the courses he have enrolled
-            for (const element of userDetails.accountCourses) {
-                await Courses.findByIdAndUpdate(element, {
-                    $pull: {
-                        studentEnrolled: user_id
-                    }
-                })
-            }
             // delete the user also
             await User.findByIdAndDelete({_id: user_id});
         });
        
-
         return res.status(200).json({
             success:true,
             message: "Account have deleted successfully"
@@ -93,7 +95,7 @@ exports.getAllUserDetails = async (req, res) => {
 	try {
 		const id = req.user.id;
 		const userDetails = await User.findById(id)
-			.populate("additionalDetails")
+			.populate("accountDetails")
 			.exec();
 		console.log(userDetails);
 		res.status(200).json({

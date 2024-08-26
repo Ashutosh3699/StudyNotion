@@ -7,7 +7,7 @@ exports.createSubSection= async(req,res)=>{
         // fetch the data --> section_id, title, videoDetail, timeDuration
         const {section_id, title, videoDetail, timeDuration} = req.body;
         // fetch the file for video
-        const {video} = req.files.videoFile;
+        const video = req.files.videoFile;
         // validation
         if(!video || !videoDetail || !section_id || !title || !timeDuration){
 
@@ -17,12 +17,14 @@ exports.createSubSection= async(req,res)=>{
             })
         }
         // get secured_url
-        const secured_url = await fileAndImageUploader(video, process.env.FOLDER_NAME);
+        // console.log("first");
+        const video_url = await fileAndImageUploader(video, process.env.FOLDER_NAME);
+        console.log("video: ", video_url.secure_url);
         // create sub-section in db
         const subSection_id = await SubSection.create({
             title,
             videoDetail,
-            video:secured_url,
+            video:video_url.secure_url,
             timeDuration
         });
         // push the obj_id in section
@@ -30,7 +32,7 @@ exports.createSubSection= async(req,res)=>{
             $push: {
                 videoUrl : subSection_id
             }
-        });
+        }, {new:true});
         // response
         return res.status(200).json({
             success: true,

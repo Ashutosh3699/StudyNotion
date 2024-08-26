@@ -23,7 +23,7 @@ exports.sendOtp = async(req,res)=>{
         }
         // check the user is already exist or not
         const userExistinDb = await User.findOne({email});
-        if(!userExistinDb){
+        if(userExistinDb){
             return res.status(401).json({
                 success:false,
                 message: "User is already exist"
@@ -48,6 +48,7 @@ exports.sendOtp = async(req,res)=>{
             result = await OTP.findOne({otp});
         }
         // create the otp data in databse and before saving the otp will be send to user
+
         const data = await OTP.create({
             email,
             otp
@@ -83,7 +84,7 @@ exports.signUp =  async(req,res) =>{
         }
         // check user is already exist
         const userExist = await User.findOne({email});
-        if(!userExist){
+        if(userExist){
             return res.status(401).json({
                 success:false,
                 message: "Data is incomplete, please fill all the data"
@@ -97,9 +98,16 @@ exports.signUp =  async(req,res) =>{
             })
         }
         // bring the otp from db and check the otp is correct while entering
-        const otpDb = await OTP.find({email});
-
-        if(otp !== otpDb){
+        const otpDb = await OTP.find({email}).sort({ createdAt: -1 }).limit(1);;
+        console.log(otpDb);
+        if (otpDb.length === 0) {
+			// OTP not found for the email
+			return res.status(400).json({
+				success: false,
+				message: "The OTP is not valid",
+			});
+		} 
+        else if(otp !== otpDb[0].otp){
             return res.status(401).json({
                 success:false,
                 message: "OTP is false please enter correct otp"

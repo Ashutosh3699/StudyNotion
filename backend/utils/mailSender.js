@@ -5,10 +5,10 @@ const mailsender = async (email,title,body)=>{
     try {
         
         const transporter  = nodemailer.createTransport({
-            host: MAIL_HOST,
+            host: process.env.MAIL_HOST,
             auth: {
-                user: MAIL_EMAIL,
-                pass: MAIL_PASS
+                user: process.env.MAIL_EMAIL,
+                pass: process.env.MAIL_PASS
             }
         });
 

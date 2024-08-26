@@ -10,8 +10,8 @@ const {isAuth} = require("../middleware/Auth");
 //                                      Profile routes
 // ********************************************************************************************************
 // Delet User Account
-profileRouter.post("/updateProfile", isAuth, updateProfile);
-profileRouter.delete("/deleteProfile", deleteProfile);
+profileRouter.put("/updateProfile", isAuth, updateProfile);
+profileRouter.delete("/deleteProfile", isAuth, deleteProfile);
 profileRouter.get("/getAlluserDetails", isAuth, getAllUserDetails);
 
 module.exports = profileRouter
